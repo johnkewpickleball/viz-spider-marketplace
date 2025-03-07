@@ -1,6 +1,7 @@
 var path = require("path");
 
 const TerserPlugin = require("terser-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 var webpackConfig = {
   mode: "production",
@@ -12,7 +13,7 @@ var webpackConfig = {
   },
   output: {
     filename: "bundle.js",
-    path: path.join(path.resolve(__dirname), "/dist"),
+    path: path.join(path.resolve(__dirname), "dist"),
     library: "[name]",
     libraryTarget: "umd",
   },
@@ -20,14 +21,21 @@ var webpackConfig = {
     extensions: [".js"],
     modules: [path.join(__dirname, "../src"), "node_modules"],
   },
-  plugins: [new TerserPlugin()],
+  plugins: [
+    new TerserPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "manifest.lkml", to: "." },
+      ],
+    }),
+  ],
   module: {
     rules: [
       { test: /\.(js|jsx)$/, use: "babel-loader" },
-      { 
-        test: /\.css$/i, 
+      {
+        test: /\.css$/i,
         use: [
-          {loader: "style-loader", options: {injectType: 'lazyStyleTag'}},
+          { loader: "style-loader", options: { injectType: 'lazyStyleTag'}},
           "css-loader"
         ]
       },
